@@ -1,0 +1,10 @@
+{
+  "name": "node-profiling",
+  "version": "1.0.0",
+  "main": "main.js",
+  "author": "Hugh Ku <hughku@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "v8-profiler-node8": "^6.2.0"
+  }
+}
