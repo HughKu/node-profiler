@@ -20,7 +20,7 @@ function heapDump() {
     // console.log('Current memory usage: %j', process.memoryUsage());
     nextMBThreshold += 50;
     const snap = profiler.takeSnapshot("profile");
-    saveHeapSnapshot(snap, _datadir);
+    _saveHeapSnapshot(snap, _datadir);
   }
 }
 
@@ -30,7 +30,7 @@ function heapDump() {
  * @param snapshot Snapshot object
  * @param datadir Location to save to
  */
-function saveHeapSnapshot(snapshot, datadir) {
+function _saveHeapSnapshot(snapshot, datadir) {
   let buffer = "";
   const stamp = Date.now();
   snapshot.serialize(
@@ -40,7 +40,7 @@ function saveHeapSnapshot(snapshot, datadir) {
     function complete() {
       const name = stamp + ".heapsnapshot";
       fs.writeFile(datadir + "/" + name, buffer, function () {
-        console.log("Heap snapshot written to " + name);
+        console.log("Heap snapshot written to " + datadir + "/" + name);
       });
     }
   );
@@ -57,10 +57,26 @@ function memoryUsageDump() {
       heapTotal / UNIT
     }, ${heapUsed / UNIT}, ${external / UNIT}]`
   );
+  _saveMemoryUsage({ rss, heapTotal, heapUsed, external }, _datadir);
 }
 
 /**
- * Schedule a heapdump by the end of next tick
+ * Saves a given memory usage
+ *
+ * @param { rss, heapTotal, heapUsed, external } Memory usage
+ * @param datadir Location to save to
+ */
+function _saveMemoryUsage({ rss, heapTotal, heapUsed, external }, datadir) {
+  const stamp = Date.now();
+  const buffer = { rss, heapTotal, heapUsed, external };
+  const name = stamp + ".memoryusage";
+  fs.writeFile(datadir + "/" + name, buffer, function () {
+    console.log("Memory usage written to " + datadir + "/" + name);
+  });
+}
+
+/**
+ * Schedule a dump by the end of next tick
  */
 function nextTickDump() {
   setImmediate(function () {
@@ -74,7 +90,7 @@ function nextTickDump() {
  *
  * @param datadir Folder to save the head dump to
  */
-module.exports.init = function (datadir, internal = 500) {
+module.exports.init = function (datadir, interval = 500) {
   _datadir = datadir;
-  setInterval(nextTickDump, internal);
+  setInterval(nextTickDump, interval);
 };
