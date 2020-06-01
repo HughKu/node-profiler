@@ -70,7 +70,7 @@ function _saveMemoryUsage({ rss, heapTotal, heapUsed, external }, datadir) {
   const stamp = Date.now();
   const buffer = { rss, heapTotal, heapUsed, external };
   const name = stamp + ".memoryusage";
-  fs.writeFile(datadir + "/" + name, buffer, function () {
+  fs.writeFile(datadir + "/" + name, JSON.stringify(buffer), function () {
     console.log("Memory usage written to " + datadir + "/" + name);
   });
 }
